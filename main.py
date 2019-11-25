@@ -55,11 +55,8 @@ def sort_nodes(line, nodes):
 def build_graph(line, nodes):
     network = networkx.Graph()
 
-    nodes_geoms = []
-    for node in nodes:
-        nodes_geoms.append(node['geometry'])
-
-    edges = ops.split(line, geometry.MultiPoint(nodes_geoms))
+    nodes_geom = geometry.MultiPoint([node['geometry'] for node in nodes])
+    edges = ops.split(line, nodes_geom)
 
     for i in range(0, len(nodes)):
         node = nodes[i]
