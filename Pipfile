@@ -9,6 +9,7 @@ verify_ssl = true
 shapely = "*"
 matplotlib = "*"
 geopandas = "*"
+networkx = "*"
 
 [requires]
 python_version = "3.7"

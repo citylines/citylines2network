@@ -6,6 +6,7 @@ import matplotlib
 matplotlib.use('TkAgg')
 
 import matplotlib.pyplot as plt
+import networkx
 
 def unified_segment(data):
     edges = []
@@ -23,7 +24,11 @@ def snap_nodes(line, nodes_collection):
     for node in nodes_collection['features']:
         p = geometry.shape(node['geometry'])
         projected_p = line.interpolate(line.project(p))
-        nodes.append(projected_p)
+        new_node = {
+                'properties': node['properties'],
+                'geometry': projected_p
+                }
+        nodes.append(new_node)
     return nodes
 
 def sort_nodes(line, nodes):
@@ -38,7 +43,7 @@ def sort_nodes(line, nodes):
         nearest_index = None
         for i in range(len(nodes)):
             n = nodes[i]
-            if l.distance(n) < 1e-8:
+            if l.distance(n['geometry']) < 1e-8:
                 nearest = n
                 nearest_index = i
 
@@ -47,18 +52,43 @@ def sort_nodes(line, nodes):
             sorted_nodes.append(nearest)
     return sorted_nodes
 
+def build_graph(line, nodes):
+    network = networkx.Graph()
+
+    nodes_geoms = []
+    for node in nodes:
+        nodes_geoms.append(node['geometry'])
+
+    edges = ops.split(line, geometry.MultiPoint(nodes_geoms))
+
+    for i in range(0, len(nodes)):
+        node = nodes[i]
+        current_node_id = node['properties']['id']
+        coords = list(node['geometry'].coords)[0]
+        network.add_node(current_node_id)
+        if i > 0:
+            previous_node_id = nodes[i-1]['properties']['id']
+            network.add_edge(previous_node_id, current_node_id)
+
+    return network
+
 def load(edges_fc, nodes_fc):
     line = unified_segment(edges_fc)
     nodes = snap_nodes(line, nodes_fc)
     nodes = sort_nodes(line, nodes.copy())
 
+    network = build_graph(line, nodes)
+    pos = dict([(node['properties']['id'],list(node['geometry'].coords)[0]) for node in nodes])
+    networkx.draw(network,pos,with_labels=True)
+
     fig,ax = plt.subplots(1,1,sharex=True,sharey=True)
 
     gpd.GeoDataFrame(geometry=[line]).plot(ax=ax)
-    gpd.GeoDataFrame(geometry=nodes).plot(ax=ax, color='red')
+    geometries = [node['geometry'] for node in nodes]
+    gpd.GeoDataFrame(geometry=geometries).plot(ax=ax, color='red')
 
     for i in range(len(nodes)):
-        coords = list(nodes[i].coords)[0]
+        coords = list(nodes[i]['geometry'].coords)[0]
         plt.annotate(str(i), xy=coords)
 
     plt.show()
