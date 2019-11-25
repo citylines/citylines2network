@@ -8,10 +8,8 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import networkx
 
-def unified_segment(data):
-    edges = []
-    for element in data['features']:
-        edges.append(geometry.shape(element['geometry']))
+def join_features(data):
+    edges = [geometry.shape(f['geometry']) for f in data['features']]
 
     multiline = ops.linemerge(edges)
     coords_list = [list(line.coords) for line in multiline]
@@ -68,7 +66,7 @@ def build_graph(line, nodes):
     return network
 
 def load(edges_fc, nodes_fc):
-    line = unified_segment(edges_fc)
+    line = join_features(edges_fc)
     nodes = snap_nodes(line, nodes_fc)
     nodes = sort_nodes(line, nodes.copy())
 
