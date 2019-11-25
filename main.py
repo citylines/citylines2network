@@ -29,11 +29,9 @@ def snap_nodes(line, nodes_collection):
 def sort_nodes(line, nodes):
     coords = line.coords
     sorted_nodes = []
-    for i in range(0, len(coords)):
-        if len(coords[0:i]) < 2:
-            continue
-
-        l = geometry.LineString(coords[0:i])
+    for i in range(2, len(coords)):
+        # We only take the segment formed by 2 coords
+        l = geometry.LineString(coords[i-2:i])
 
         dist = None
         nearest = None
