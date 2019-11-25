@@ -38,7 +38,6 @@ def sort_nodes(line, nodes):
         # We only take the segment formed by 2 coords
         l = geometry.LineString(coords[i-2:i])
 
-        dist = None
         nearest = None
         nearest_index = None
         for i in range(len(nodes)):
@@ -60,12 +59,11 @@ def build_graph(line, nodes):
 
     for i in range(0, len(nodes)):
         node = nodes[i]
-        current_node_id = node['properties']['id']
-        coords = list(node['geometry'].coords)[0]
-        network.add_node(current_node_id)
+        node_id = node['properties']['id']
+        network.add_node(node_id)
         if i > 0:
             previous_node_id = nodes[i-1]['properties']['id']
-            network.add_edge(previous_node_id, current_node_id)
+            network.add_edge(previous_node_id, node_id)
 
     return network
 
