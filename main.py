@@ -18,7 +18,7 @@ def unified_segment(data):
     return geometry.LineString([item for sublist in coords_list for item in sublist])
 
 
-def snapped_nodes(line, nodes_collection):
+def snap_nodes(line, nodes_collection):
     nodes = []
     for node in nodes_collection['features']:
         p = geometry.shape(node['geometry'])
@@ -40,9 +40,7 @@ def sort_nodes(line, nodes):
         nearest_index = None
         for i in range(len(nodes)):
             n = nodes[i]
-            d = l.project(n)
-            if dist == None or d < dist:
-                dist = d
+            if l.distance(n) < 1e-8:
                 nearest = n
                 nearest_index = i
 
@@ -53,7 +51,7 @@ def sort_nodes(line, nodes):
 
 def load(edges_fc, nodes_fc):
     line = unified_segment(edges_fc)
-    nodes = snapped_nodes(line, nodes_fc)
+    nodes = snap_nodes(line, nodes_fc)
     nodes = sort_nodes(line, nodes.copy())
 
     fig,ax = plt.subplots(1,1,sharex=True,sharey=True)
