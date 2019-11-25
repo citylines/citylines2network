@@ -20,22 +20,51 @@ def unified_segment(data):
 
 def snapped_nodes(line, nodes_collection):
     nodes = []
-    orig_nodes = []
     for node in nodes_collection['features']:
         p = geometry.shape(node['geometry'])
-        orig_nodes.append(p)
         projected_p = line.interpolate(line.project(p))
         nodes.append(projected_p)
     return nodes
 
+def sort_nodes(line, nodes):
+    coords = line.coords
+    sorted_nodes = []
+    for i in range(0, len(coords)):
+        if len(coords[0:i]) < 2:
+            continue
+
+        l = geometry.LineString(coords[0:i])
+
+        dist = None
+        nearest = None
+        nearest_index = None
+        for i in range(len(nodes)):
+            n = nodes[i]
+            d = l.project(n)
+            if dist == None or d < dist:
+                dist = d
+                nearest = n
+                nearest_index = i
+
+        if nearest:
+            del(nodes[nearest_index])
+            sorted_nodes.append(nearest)
+    return sorted_nodes
+
 def load(edges_fc, nodes_fc):
     line = unified_segment(edges_fc)
     nodes = snapped_nodes(line, nodes_fc)
+    nodes = sort_nodes(line, nodes.copy())
 
     fig,ax = plt.subplots(1,1,sharex=True,sharey=True)
 
     gpd.GeoDataFrame(geometry=[line]).plot(ax=ax)
     gpd.GeoDataFrame(geometry=nodes).plot(ax=ax, color='red')
+
+    for i in range(len(nodes)):
+        coords = list(nodes[i].coords)[0]
+        plt.annotate(str(i), xy=coords)
+
     plt.show()
 
 if __name__ == '__main__':
