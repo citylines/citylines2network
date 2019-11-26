@@ -12,10 +12,13 @@ class Line:
     def _build_route(self, edges_collection):
         edges = [geometry.shape(f['geometry']) for f in edges_collection]
 
-        multiline = ops.linemerge(edges)
-        coords_list = [list(line.coords) for line in multiline]
+        merged = ops.linemerge(edges)
 
-        return geometry.LineString([item for sublist in coords_list for item in sublist])
+        if isinstance(merged, geometry.LineString):
+            return merged
+        else:
+            coords_list = [list(line.coords) for line in merged]
+            return geometry.LineString([item for sublist in coords_list for item in sublist])
 
     def _snap_nodes(self, nodes_collection):
         nodes = []
