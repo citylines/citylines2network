@@ -7,33 +7,47 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import networkx
 
-from lib.line import Line
-from lib.filter import Filter
+from lib.system import System
+
+def build_systems_dict(edges, nodes):
+    sdict = {}
+
+    features_list = [edges, nodes]
+    keys = ['edges','nodes']
+    for i in range(2):
+        features = features_list[i]
+        key = keys[i]
+        for f in features:
+            for l in f['properties']['lines']:
+                system = l['system']
+                line = l['line']
+                if not system in sdict:
+                    sdict[system] = {}
+                if not line in sdict[system]:
+                    sdict[system][line] = {'edges':[], 'nodes':[]}
+                sdict[system][line][key].append(f)
+
+    return sdict
 
 def load(edges_fc, nodes_fc):
-    af = Filter(edges_fc['features'], nodes_fc['features'], lines=['a'])
-    a = Line(af.edges, af.nodes)
-    a_graph = a.graph()
+    sdict = build_systems_dict(edges_fc['features'], nodes_fc['features'])
+    print('Systems:')
+    print(list(sdict.keys()))
 
-    bf = Filter(edges_fc['features'], nodes_fc['features'], lines=['b'])
-    b = Line(bf.edges, bf.nodes)
-    b_graph = b.graph()
+    subte = System(sdict['Subte'], year=2019)
 
-    network = networkx.compose(a_graph, b_graph)
-
-    pos = dict([(node['properties']['id'],list(node['geometry'].coords)[0]) for node in a.nodes + b.nodes])
-    networkx.draw(network,pos,with_labels=True)
+    pos = dict([(node['properties']['id'],list(node['geometry'].coords)[0]) for node in subte.nodes])
+    networkx.draw(subte.graph(),pos,with_labels=True)
 
     fig,ax = plt.subplots(1,1,sharex=True,sharey=True)
 
-    gpd.GeoDataFrame(geometry=[a.route,b.route]).plot(ax=ax)
-    geometries = [node['geometry'] for node in a.nodes + b.nodes]
+    gpd.GeoDataFrame(geometry=subte.routes).plot(ax=ax)
+    geometries = [node['geometry'] for node in subte.nodes]
     gpd.GeoDataFrame(geometry=geometries).plot(ax=ax, color='red')
 
-    for line in [a,b]:
-        for i in range(len(line.nodes)):
-            coords = list(line.nodes[i]['geometry'].coords)[0]
-            plt.annotate(str(i), xy=coords)
+    for i in range(len(subte.nodes)):
+        coords = list(subte.nodes[i]['geometry'].coords)[0]
+        plt.annotate(str(i), xy=coords)
 
     plt.show()
 
