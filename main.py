@@ -11,29 +11,35 @@ from lib.line import Line
 from lib.filter import Filter
 
 def load(edges_fc, nodes_fc):
-    f = Filter(edges_fc['features'], nodes_fc['features'], lines=['1776-linea-1'])
-    line = Line(f.edges, f.nodes)
+    af = Filter(edges_fc['features'], nodes_fc['features'], lines=['a'])
+    a = Line(af.edges, af.nodes)
+    a_graph = a.graph()
 
-    network = line.graph()
+    bf = Filter(edges_fc['features'], nodes_fc['features'], lines=['b'])
+    b = Line(bf.edges, bf.nodes)
+    b_graph = b.graph()
 
-    pos = dict([(node['properties']['id'],list(node['geometry'].coords)[0]) for node in line.nodes])
+    network = networkx.compose(a_graph, b_graph)
+
+    pos = dict([(node['properties']['id'],list(node['geometry'].coords)[0]) for node in a.nodes + b.nodes])
     networkx.draw(network,pos,with_labels=True)
 
     fig,ax = plt.subplots(1,1,sharex=True,sharey=True)
 
-    gpd.GeoDataFrame(geometry=[line.route]).plot(ax=ax)
-    geometries = [node['geometry'] for node in line.nodes]
+    gpd.GeoDataFrame(geometry=[a.route,b.route]).plot(ax=ax)
+    geometries = [node['geometry'] for node in a.nodes + b.nodes]
     gpd.GeoDataFrame(geometry=geometries).plot(ax=ax, color='red')
 
-    for i in range(len(line.nodes)):
-        coords = list(line.nodes[i]['geometry'].coords)[0]
-        plt.annotate(str(i), xy=coords)
+    for line in [a,b]:
+        for i in range(len(line.nodes)):
+            coords = list(line.nodes[i]['geometry'].coords)[0]
+            plt.annotate(str(i), xy=coords)
 
     plt.show()
 
 if __name__ == '__main__':
-    edges_filename = 'data/quito_sections.geojson'
-    nodes_filename = 'data/quito_stations.geojson'
+    edges_filename = 'data/buenos-aires_sections.geojson'
+    nodes_filename = 'data/buenos-aires_stations.geojson'
 
     with open(edges_filename) as edges_file, open(nodes_filename) as nodes_file:
         load(json.load(edges_file), json.load(nodes_file))
