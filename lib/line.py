@@ -9,7 +9,11 @@ class Line:
         self.nodes = self._sort_nodes(nodes)
         self.edges = self._build_edges()
 
-    def _join_edges(self, edges):
+    '''
+    This method replaces unique head or tail nodes with tail or head nodes
+    of other segments, so they can be joind succesfully by shapely.ops.merge.
+    '''
+    def _fix_edges_nodes(self, edges):
         dist_threshold = 0.0001
 
         for edge_idx in range(len(edges)):
@@ -36,31 +40,28 @@ class Line:
                         min_dist = el[1]
                         min_point = el[0]
 
-                print(min_dist)
                 if min_dist < dist_threshold and min_dist != 0:
                     edge_coords = list(edge.coords)
-                    print("node replaced")
                     if i == 0:
                         old = edge_coords[0]
                         edge_coords[0] = min_point
-                        print(old,'vs',min_point)
                     else:
                         old = edge_coords[-1]
                         edge_coords[-1] = min_point
-                        print(old,'vs',min_point)
                     edges[edge_idx] = geometry.LineString(edge_coords)
         return edges
 
     def _build_route(self, edges_collection):
         edges = [geometry.shape(f['geometry']) for f in edges_collection]
-        edges = self._join_edges(edges)
+        edges = self._fix_edges_nodes(edges)
         merged = ops.linemerge(edges)
 
         if isinstance(merged, geometry.LineString):
             return merged
         else:
             '''
-            This case is for situations were the segment sorting failed.
+            This case is for situations were the nodes of the edges could not
+            been fixed succesfully.
             It may generate wrong ouputs
             '''
             coords_list = [list(line.coords) for line in merged]
