@@ -9,14 +9,60 @@ class Line:
         self.nodes = self._sort_nodes(nodes)
         self.edges = self._build_edges()
 
+    def _join_edges(self, edges):
+        dist_threshold = 0.0001
+
+        for edge_idx in range(len(edges)):
+            edge = edges[edge_idx]
+            head = edge.coords[0]
+            tail = edge.coords[-1]
+            coords = [head, tail]
+
+            for i in range(2):
+                node = coords[i]
+                dists = []
+                for e in edges:
+                    if e != edge:
+                        h = e.coords[0]
+                        t = e.coords[-1]
+                        point = geometry.Point(node)
+                        dists.append((h, point.distance(geometry.Point(h))))
+                        dists.append((t, point.distance(geometry.Point(t))))
+
+                min_dist = None
+                min_point = None
+                for el in dists:
+                    if min_dist is None or el[1] < min_dist:
+                        min_dist = el[1]
+                        min_point = el[0]
+
+                print(min_dist)
+                if min_dist < dist_threshold and min_dist != 0:
+                    edge_coords = list(edge.coords)
+                    print("node replaced")
+                    if i == 0:
+                        old = edge_coords[0]
+                        edge_coords[0] = min_point
+                        print(old,'vs',min_point)
+                    else:
+                        old = edge_coords[-1]
+                        edge_coords[-1] = min_point
+                        print(old,'vs',min_point)
+                    edges[edge_idx] = geometry.LineString(edge_coords)
+        return edges
+
     def _build_route(self, edges_collection):
         edges = [geometry.shape(f['geometry']) for f in edges_collection]
-
+        edges = self._join_edges(edges)
         merged = ops.linemerge(edges)
 
         if isinstance(merged, geometry.LineString):
             return merged
         else:
+            '''
+            This case is for situations were the segment sorting failed.
+            It may generate wrong ouputs
+            '''
             coords_list = [list(line.coords) for line in merged]
             return geometry.LineString([item for sublist in coords_list for item in sublist])
 
