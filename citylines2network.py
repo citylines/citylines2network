@@ -6,7 +6,6 @@ class Citylines2Network:
 
     def _build_systems_dict(self, edges, nodes):
         sdict = {}
-
         features_list = [edges, nodes]
         keys = ['edges','nodes']
         for i in range(2):
@@ -21,7 +20,6 @@ class Citylines2Network:
                     if not line in sdict[system]:
                         sdict[system][line] = {'edges':[], 'nodes':[]}
                     sdict[system][line][key].append(f)
-
         return sdict
 
     def system_names(self):
