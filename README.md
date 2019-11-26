@@ -1,5 +1,5 @@
 # citylines2network
-Create routable networks from citylines dumps. As citylines data includes historical data, historical network graphs can be created.
+Create routable networks from citylines dumps. As citylines data includes the historical evolution of transit systems, network graphs can be created for different years.
 
 **Work in progress**
 
