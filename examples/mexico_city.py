@@ -8,6 +8,10 @@ matplotlib.use('TkAgg')
 
 import matplotlib.pyplot as plt
 import networkx
+import sys,os
+
+sys.path.insert(1, os.path.join(sys.path[0], '..'))
+
 from citylines2network import Citylines2Network
 
 def load(edges_fc, nodes_fc):
@@ -28,6 +32,7 @@ def load(edges_fc, nodes_fc):
         coords = list(metro.nodes[i]['geometry'].coords)[0]
         plt.annotate(str(i), xy=coords)
     '''
+
     plt.title('Mexico City Metro - 2015')
     plt.show()
 
