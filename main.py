@@ -8,9 +8,11 @@ import matplotlib.pyplot as plt
 import networkx
 
 from lib.line import Line
+from lib.filter import Filter
 
 def load(edges_fc, nodes_fc):
-    line = Line(edges_fc['features'], nodes_fc['features'])
+    f = Filter(edges_fc['features'], nodes_fc['features'], lines=['1776-linea-1'])
+    line = Line(f.edges, f.nodes)
 
     network = line.graph()
 
