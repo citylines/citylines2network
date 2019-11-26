@@ -17,7 +17,6 @@ class Line:
 
         return geometry.LineString([item for sublist in coords_list for item in sublist])
 
-
     def _snap_nodes(self, nodes_collection):
         nodes = []
         for node in nodes_collection:
@@ -66,5 +65,3 @@ class Line:
                 network.add_edge(previous_node_id, node_id)
 
         return network
-
-
