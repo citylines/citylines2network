@@ -57,7 +57,7 @@ class Line:
     def graph(self):
         network = networkx.Graph()
 
-        for i in range(0, len(self.nodes)):
+        for i in range(len(self.nodes)):
             node = self.nodes[i]
             node_id = node['properties']['id']
             network.add_node(node_id)
