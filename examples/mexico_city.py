@@ -7,7 +7,6 @@ import matplotlib
 matplotlib.use('TkAgg')
 
 import matplotlib.pyplot as plt
-import networkx
 import sys,os
 
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
