@@ -3,14 +3,14 @@ import networkx
 
 class Line:
     def __init__(self, edges_fc, nodes_fc):
-        self.route = self._join_features(edges_fc)
+        self.route = self._build_route(edges_fc)
         nodes = self._snap_nodes(nodes_fc)
 
         self.nodes = self._sort_nodes(nodes)
         self.edges = self._build_edges()
 
-    def _join_features(self, data):
-        edges = [geometry.shape(f['geometry']) for f in data['features']]
+    def _build_route(self, edges_collection):
+        edges = [geometry.shape(f['geometry']) for f in edges_collection]
 
         multiline = ops.linemerge(edges)
         coords_list = [list(line.coords) for line in multiline]
@@ -20,7 +20,7 @@ class Line:
 
     def _snap_nodes(self, nodes_collection):
         nodes = []
-        for node in nodes_collection['features']:
+        for node in nodes_collection:
             p = geometry.shape(node['geometry'])
             projected_p = self.route.interpolate(self.route.project(p))
             new_node = {

@@ -10,7 +10,7 @@ import networkx
 from lib.line import Line
 
 def load(edges_fc, nodes_fc):
-    line = Line(edges_fc, nodes_fc)
+    line = Line(edges_fc['features'], nodes_fc['features'])
 
     network = line.graph()
 
