@@ -2,7 +2,9 @@ from shapely import geometry, ops
 import networkx
 
 class Line:
-    def __init__(self, edges_fc, nodes_fc):
+    def __init__(self, edges_fc, nodes_fc, edge_snap_threshold=0.001):
+        self.edge_snap_threshold = edge_snap_threshold
+
         self.route = self._build_route(edges_fc)
         nodes = self._snap_nodes(nodes_fc)
 
@@ -13,9 +15,7 @@ class Line:
     This method replaces unique head or tail nodes with tail or head nodes
     of other segments, so they can be joind succesfully by shapely.ops.merge.
     '''
-    def _fix_edges_nodes(self, edges):
-        dist_threshold = 0.0001
-
+    def _snap_edges(self, edges):
         for edge_idx in range(len(edges)):
             edge = edges[edge_idx]
             head = edge.coords[0]
@@ -40,7 +40,7 @@ class Line:
                         min_dist = el[1]
                         min_point = el[0]
 
-                if min_dist is not None and min_dist != 0 and min_dist < dist_threshold:
+                if min_dist is not None and min_dist != 0 and min_dist < self.edge_snap_threshold:
                     edge_coords = list(edge.coords)
                     if i == 0:
                         old = edge_coords[0]
@@ -53,7 +53,7 @@ class Line:
 
     def _build_route(self, edges_collection):
         edges = [geometry.shape(f['geometry']) for f in edges_collection]
-        edges = self._fix_edges_nodes(edges)
+        edges = self._snap_edges(edges)
         merged = ops.linemerge(edges)
 
         if isinstance(merged, geometry.LineString):
@@ -61,7 +61,7 @@ class Line:
         else:
             '''
             This case is for situations were the nodes of the edges could not
-            been fixed succesfully.
+            snapped fixed succesfully.
             It may generate wrong ouputs
             '''
             coords_list = [list(line.coords) for line in merged]
