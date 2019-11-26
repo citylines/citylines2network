@@ -40,7 +40,7 @@ class Line:
                         min_dist = el[1]
                         min_point = el[0]
 
-                if min_dist < dist_threshold and min_dist != 0:
+                if min_dist is not None and min_dist != 0 and min_dist < dist_threshold:
                     edge_coords = list(edge.coords)
                     if i == 0:
                         old = edge_coords[0]
