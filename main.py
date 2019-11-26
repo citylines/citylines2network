@@ -15,13 +15,11 @@ def load(edges_fc, nodes_fc):
     print(c2n.system_names())
     print(c2n.system_line_names('Sistema de Transporte Colectivo (STC)'))
 
-    metro = c2n.system('Sistema de Transporte Colectivo (STC)', year=1996)
+    metro = c2n.system('Sistema de Transporte Colectivo (STC)', year=2015)
+    metro.draw_graph()
 
-    pos = dict([(node['properties']['id'],list(node['geometry'].coords)[0]) for node in metro.nodes])
-    networkx.draw(metro.graph(),pos,with_labels=True,node_size=50, font_size=9)
-
+    '''
     fig,ax = plt.subplots(1,1,sharex=True,sharey=True)
-
     gpd.GeoDataFrame(geometry=metro.routes).plot(ax=ax)
     geometries = [node['geometry'] for node in metro.nodes]
     gpd.GeoDataFrame(geometry=geometries).plot(ax=ax, color='red')
@@ -29,7 +27,8 @@ def load(edges_fc, nodes_fc):
     for i in range(len(metro.nodes)):
         coords = list(metro.nodes[i]['geometry'].coords)[0]
         plt.annotate(str(i), xy=coords)
-
+    '''
+    plt.title('Mexico City Metro - 2015')
     plt.show()
 
 if __name__ == '__main__':

@@ -27,3 +27,13 @@ class System:
     def graph(self):
         graphs = [line.graph() for line in self.lines]
         return networkx.compose_all(graphs)
+
+    def draw_graph(self, with_labels=False,node_size=50,font_size=9):
+        pos = dict([(node['properties']['id'],list(node['geometry'].coords)[0]) for node in self.nodes])
+        networkx.draw_networkx(
+                self.graph(),
+                pos,
+                with_labels=with_labels,
+                node_size=node_size,
+                font_size=font_size
+                )
