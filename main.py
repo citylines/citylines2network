@@ -37,7 +37,7 @@ def load(edges_fc, nodes_fc):
     subte = System(sdict['Subte'], year=1996)
 
     pos = dict([(node['properties']['id'],list(node['geometry'].coords)[0]) for node in subte.nodes])
-    networkx.draw(subte.graph(),pos,with_labels=True)
+    networkx.draw(subte.graph(),pos,with_labels=True,node_size=50, font_size=9)
 
     fig,ax = plt.subplots(1,1,sharex=True,sharey=True)
 
