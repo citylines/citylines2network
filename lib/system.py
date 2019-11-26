@@ -19,7 +19,7 @@ class System:
             if len(self.line_names) and not l in self.line_names:
                 continue
             f = Filter(self.sdict[l]['edges'], self.sdict[l]['nodes'], year=self.year)
-            if len(f.edges) and len(f.nodes):
+            if f.valid():
                 line = Line(f.edges, f.nodes)
                 lines.append(line)
         return lines

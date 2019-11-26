@@ -25,3 +25,6 @@ class Filter:
 
     def _year_condition(self, props):
         return props['opening'] <= self.year and (props['closure'] is None or props['closure'] > self.year)
+
+    def valid(self):
+        return len(self.nodes) > 1 and len(self.edges) > 0
