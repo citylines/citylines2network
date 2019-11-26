@@ -3,22 +3,25 @@ class Filter:
         self.lines = lines
         self.year = year
 
-        self.edges = []
-        self.nodes = []
+        self.edges = list(filter(self._match_features, edges_fc))
+        self.nodes = list(filter(self._match_features, nodes_fc))
 
-        if year:
-            self.edges += filter(self._match_year, edges_fc)
-            self.nodes += filter(self._match_year, nodes_fc)
-
-        if len(lines) >0:
-            self.edges += filter(self._match_lines, edges_fc)
-            self.nodes += filter(self._match_lines, nodes_fc)
-
-    def _match_lines(self, feature):
-        f_lines = [l['line_url_name'] for l in feature['properties']['lines']]
-        return set(f_lines) & set(self.lines)
-
-
-    def _match_year(self, feature):
+    def _match_features(self, feature):
         props = feature['properties']
+
+        conditions = []
+        if len(self.lines):
+            conditions.append(self._lines_condition(props))
+
+        if self.year:
+            conditions.append(self._year_condition(props))
+
+        return all(conditions)
+
+    def _lines_condition(self, props):
+        f_lines = [l['line'] for l in props['lines']]
+        lines = set(f_lines) & set(self.lines)
+        return lines
+
+    def _year_condition(self, props):
         return props['opening'] <= self.year and (props['closure'] is None or props['closure'] > self.year)

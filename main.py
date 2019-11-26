@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import json
 import geopandas as gpd
 
@@ -31,10 +33,8 @@ def build_systems_dict(edges, nodes):
 
 def load(edges_fc, nodes_fc):
     sdict = build_systems_dict(edges_fc['features'], nodes_fc['features'])
-    print('Systems:')
-    print(list(sdict.keys()))
 
-    subte = System(sdict['Subte'], year=2019)
+    subte = System(sdict['Subte'], year=1996)
 
     pos = dict([(node['properties']['id'],list(node['geometry'].coords)[0]) for node in subte.nodes])
     networkx.draw(subte.graph(),pos,with_labels=True)

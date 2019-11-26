@@ -4,9 +4,10 @@ from lib.line import Line
 from lib.filter import Filter
 
 class System:
-    def __init__(self, sdict, year=None):
+    def __init__(self, sdict, year=None, line_names=[]):
         self.sdict = sdict
         self.year = year
+        self.line_names = line_names
         self.lines = self._load_lines()
 
         self.nodes = [node for line in self.lines for node in line.nodes]
@@ -15,9 +16,12 @@ class System:
     def _load_lines(self):
         lines = []
         for l in self.sdict:
+            if len(self.line_names) and not l in self.line_names:
+                continue
             f = Filter(self.sdict[l]['edges'], self.sdict[l]['nodes'], year=self.year)
-            line = Line(f.edges, f.nodes)
-            lines.append(line)
+            if len(f.edges) and len(f.nodes):
+                line = Line(f.edges, f.nodes)
+                lines.append(line)
         return lines
 
     def graph(self):
