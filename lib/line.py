@@ -58,14 +58,13 @@ class Line:
 
         if isinstance(merged, geometry.LineString):
             return merged
-        else:
-            '''
-            This case is for situations were the nodes of the edges could not
-            snapped fixed succesfully.
-            It may generate wrong ouputs
-            '''
-            coords_list = [list(line.coords) for line in merged]
-            return geometry.LineString([item for sublist in coords_list for item in sublist])
+        '''
+        This case is for situations were the nodes of the edges could not
+        snapped fixed succesfully.
+        It may generate wrong ouputs
+        '''
+        coords_list = [list(line.coords) for line in merged]
+        return geometry.LineString([item for sublist in coords_list for item in sublist])
 
     def _snap_nodes(self, nodes_collection):
         nodes = []
@@ -73,9 +72,9 @@ class Line:
             p = geometry.shape(node['geometry'])
             projected_p = self.route.interpolate(self.route.project(p))
             new_node = {
-                    'properties': node['properties'],
-                    'geometry': projected_p
-                    }
+                'properties': node['properties'],
+                'geometry': projected_p,
+            }
             nodes.append(new_node)
         return nodes
 
