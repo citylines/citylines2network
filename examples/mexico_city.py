@@ -36,6 +36,9 @@ def load(edges_fc, nodes_fc):
     plt.show()
 
 if __name__ == '__main__':
+    """
+    Files can be downloaded from https://www.citylines.co/data?city=mexico-city
+    """
     edges_filename = 'data/mexico-city_sections.geojson'
     nodes_filename = 'data/mexico-city_stations.geojson'
 

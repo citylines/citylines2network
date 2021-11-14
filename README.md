@@ -10,3 +10,11 @@ Graph for Mexico City Metro in 1985
 Graph for Mexico City Metro in 2015
 ![df_2015](https://user-images.githubusercontent.com/6061036/69680001-eecab180-10a9-11ea-8be7-d7ad06a31c55.png)
 
+## Usage
+
+```bash
+# Make sure pipenv is already installed
+
+$ pipenv install
+$ pipenv run python examples/mexico_city.py
+```
